@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.master.LnMenuMapper">
+	<!-- 查询单条记录 -->
+	<select id="getMenuByUsercode" resultType="com.example.demo.model.LnMenu" parameterType="String">
+		SELECT lm.*,ls.subjectid,ls.flag,ls.subjectname,ls.sicon FROM ln_user_role lur INNER JOIN ln_role_menu lrm ON lur.roleid=lrm.roleid
+			       INNER JOIN ln_menu lm ON lrm.menuid=lm.menuid
+			       INNER JOIN ln_subject ls ON lm.subjectid=ls.subjectid 
+			       WHERE 
+			       lur.status=1 AND lrm.status=1 AND usercode=${usercode} ORDER BY ls.order,lm.order
+	</select>
+</mapper> 

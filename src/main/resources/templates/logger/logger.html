@@ -1,0 +1,404 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/static/lib/layui-v2.5.4/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/css/public.css}" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="layui-elem-field layuimini-search">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">操作人编码</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="userCode" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">操作人姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="operateUser" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">操作日期</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="operateDate" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">Ip</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="operateIp" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                         <div class="layui-inline">
+                            <label class="layui-form-label">浏览器版本</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="operateBrowser" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <a class="layui-btn" lay-submit="" lay-filter="data-search-btn">搜索</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+        <div class="layui-btn-group">
+            <button class="layui-btn data-add-btn">添加</button>	
+            <button class="layui-btn layui-btn-danger data-delete-btn">删除</button>
+			<button class="layui-btn layui-btn-danger data-tijiao-btn">提交</button>
+			<button class="layui-btn layui-btn-danger data-bohui-btn">驳回</button>
+        </div>
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+        </script>
+    </div>
+</div>
+<script th:src="@{/static/lib/layui-v2.5.4/layui.js}" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+		var table_date=new Array();//用于保存当前页数据
+		var idds=new Array();    //用于保存选中的数据
+		var kyxz= new Array();   //当前页数据
+		var a;
+        table.render({
+			method:'post',
+            elem: '#currentTableId',
+            url: 'getLogger',
+			done: function(res, curr, count){
+				console.log(res)
+				debugger;				
+				table_date=res.data;//获得总条数和当前页的数据
+				kyxz=res.data;
+				a=res.data.length;
+				for(var n=0;n<idds.length;n++){
+					 var h=0;
+					 for(var m=0;m<table_date.length;m++){
+						if(idds[n].id==table_date[m].id){
+							h++;
+						}
+					 }
+					 if(h==0){
+						table_date.push(idds[n]);	
+					 }
+				}
+				console.log(table_date);
+				console.log(res);
+						for(var i=0;i< table_date.length;i++){//循环当前页的数据条数的次数
+
+							for (var j = 0; j < idds.length; j++) {//循环ids的次数
+
+								if(table_date[i].id == idds[j].id) {//判断当前的数据Id和ids中的Id是否相等
+
+									table_date[i]["LAY_CHECKED"]='true';//设置勾选
+									//找到对应数据改变勾选样式
+									//var index= table_date[i]['LAY_TABLE_INDEX'];
+									var index= i;
+									$('tr[data-index=' + index + '] input[type="checkbox"]').prop('checked', true);
+									$('tr[data-index=' + index + '] input[type="checkbox"]').next().addClass('layui-form-checked');
+								}
+							}
+						}
+						var checkStatus = table.checkStatus('shipTable');//获得选中的值 和判断是否是全选 isAll true全选 isAlL false 没有全选
+						if(checkStatus.isAll){
+							$('.layui-table-header th[data-field="0"] input[type="checkbox"]').prop('checked', true);
+							$('.layui-table-header th[data-field="0"] div[class="layui-unselect layui-form-checkbox"]').addClass('layui-form-checked');
+						}
+						//恢复当前数据，为下面逻辑做处理
+						//table_date.length=a;
+			},
+          	//zhangxuan  2020/8/5 
+            cols: [ [
+                {type: "checkbox", width: 50, fixed: "left",checked:false},
+                {field: 'id', width: 60, title: 'ID', align: "center",sort: true},
+                {field: 'userCode', minWidth: 100, title: '操作人编码',align: "center"},
+				{field: 'operateUser', title: '操作人姓名',align: "center", width: 120},
+                {field: 'menuName', width: 120, title: '菜单名称',align: "center"},
+                {field: 'operateUrl', width: 120, title: '访问地址',align: "center"},
+                {field: 'operateIp', title: 'Ip',align: "center", width: 120},
+				{field: 'operateDate', title: '操作日期',align: "center", width: 120},
+                {field: 'operateBrowser', width: 120, title: '浏览器版本',align: "center", sort: true},
+                {field: 'operatingSystem', width: 120, title: '操作系统版本',align: "center", sort: true},
+/*              {field: 'produceattributes', title: '产品属性', width: 100},
+                {field: 'produceproperties', title: '产品性质', width: 100},
+                {field: 'producecategory ', title: '产品类别', width: 100},
+                {field: 'submissionmethod', title: '报送方式', width: 100},
+                {field: 'remarks', title: '备注', width: 100}, */
+                /* {field: 'classify', width: 80, title: '职业'}, */
+                /* {field: 'wealth', width: 135, title: '财富', sort: true}, */
+                {title: '操作', minWidth: 50, templet: '#currentTableBar', fixed: "right", align: "center"}
+            ] ],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 15,
+            page: true
+        });
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {     	
+            //var result = JSON.stringify(data.field);
+            //layer.alert(result, {
+            //    title: '最终的搜索信息'
+            //});
+            //执行搜索重载
+            table.reload('currentTableId', {
+				method:'post',
+                page: {
+                    curr: 1
+                }
+                , where: {
+                   userCode:data.field.userCode,
+                   operateUser:data.field.operateUser,
+				   producecategory:data.field.producecategory,
+				   operateDate:data.field.operateDate,
+				   operateIp:data.field.operateIp,
+				   operateBrowser:data.field.operateBrowser
+                }
+            }, 'data');
+            return false;
+        });
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+			debugger;
+			if(obj.checked==true){//选中
+				if(obj.type=='one'){ //选中一个type的值就是one 全选type的值就是all ==》单选
+					idds.push(obj.data);
+				}else{
+					for(var i=0;i<table_date.length;i++){//table_date为当前页所有数据 ==》全选
+						idds.push(table_date[i]);
+					}
+				}
+				idds=removeArrayRepElement(idds); //去重：没多大必要：防止异常操作
+			}else{
+				if(obj.type=='one'){//取消选中
+					for(var i=0;i<idds.length;i++){//单选
+						if(idds[i].id==obj.data.id){
+							idds.remove(i);
+						}
+					}
+				}else{
+					table_date.length=a;
+					for(var i=0;i<idds.length;i++){//全选
+						for(var j=0;j<table_date.length;j++){
+							if(idds[i].id==table_date[j].id){
+								idds[i].id=0; //数据库需要定义一个id为0得数据
+								//idds.remove(i);
+							}
+							
+						}
+					}
+				}
+			}
+        });
+		//删除数组自定义函数
+		Array.prototype.remove=function(dx){
+			if(isNaN(dx)||dx>this.length){return false;}
+			for(var i=0,n=0;i<this.length;i++)
+			{
+				if(this[i]!=this[dx]){
+					this[n++]=this[i];
+				}
+			}
+			this.length-=1;
+		};
+		//将后面重复的数删掉
+		function removeArrayRepElement(arr){
+			for (var i = 0; i < arr.length; i++) {
+				for (var j = 0; j < arr.length; j++) {
+					if (arr[i].id == arr[j].id && i != j) {
+						arr.splice(j, 1);
+					}
+				}
+			}
+			return arr;
+		}
+        // 监听添加操作
+        $(".data-add-btn").on("click", function () {
+       //     layer.msg('添加数据');
+            layer.open({
+                	  type: 2,
+                	  area: ['700px', '450px'],
+                	  fixed: false, //不固定
+                	  maxmin: true,
+                      content:"/ln/loggerAdd"    
+                	});
+        });
+
+        // 监听删除操作
+        $(".data-delete-btn").on("click", function () {
+		  layer.confirm('确认删除', function (index) {
+				var checkStatus = table.checkStatus('currentTableId')
+					, data = checkStatus.data;
+					var ids=[];
+					data.forEach(function(val,index,arr){
+						ids.push(val.id)
+					})
+				$.ajax({   
+					url:'/ln/deleteById',       
+					method:'post',       
+					data:{
+						id:ids.toString()
+					},        
+					dataType:'json',         
+					success:function(res){
+						if(res.flag){
+								layer.alert('删除成功', {
+								icon: 6,
+								title: "提示"
+								});
+								$(".layui-laypage-btn").click();
+							}else{
+								layer.alert('删除失败', {
+								icon: 5,
+								title: "提示"
+								});
+							}
+					},              
+					error:function (data) {
+					}           
+				}) ;
+				  //layer.alert(JSON.stringify(data));  
+			});
+		});
+		// 监听提交操作
+        $(".data-delete-btn").on("click", function () {
+		  layer.confirm('确认提交', function (index) {
+				var checkStatus = table.checkStatus('currentTableId')
+					, data = checkStatus.data;
+					var ids=[];
+					data.forEach(function(val,index,arr){
+						ids.push(val.id)
+					})
+				$.ajax({   
+					url:'/ln/deleteById',       
+					method:'post',       
+					data:{
+						id:ids.toString()
+					},        
+					dataType:'json',         
+					success:function(res){
+						if(res.flag){
+								layer.alert('删除成功', {
+								icon: 6,
+								title: "提示"
+								});
+								$(".layui-laypage-btn").click();
+							}else{
+								layer.alert('删除失败', {
+								icon: 5,
+								title: "提示"
+								});
+							}
+					},              
+					error:function (data) {
+					}           
+				}) ;
+				layer.alert(JSON.stringify(data));  
+			});
+		});
+		   // 监听驳回操作
+        $(".data-delete-btn").on("click", function () {
+		  layer.confirm('确认驳回', function (index) {
+				var checkStatus = table.checkStatus('currentTableId')
+					, data = checkStatus.data;
+					var ids=[];
+					data.forEach(function(val,index,arr){
+						ids.push(val.id)
+					})
+				$.ajax({   
+					url:'/ln/deleteById',       
+					method:'post',       
+					data:{
+						id:ids.toString()
+					},        
+					dataType:'json',         
+					success:function(res){
+						if(res.flag){
+								layer.alert('删除成功', {
+								icon: 6,
+								title: "提示"
+								});
+								$(".layui-laypage-btn").click();
+							}else{
+								layer.alert('删除失败', {
+								icon: 5,
+								title: "提示"
+								});
+							}
+					},              
+					error:function (data) {
+					}           
+				}) ;
+				  layer.alert(JSON.stringify(data));  
+			});
+		});
+		//监听行工具
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+            // layer.alert('编辑行：<br>' + JSON.stringify(data))
+                layer.open({
+                	  type: 2,
+                	  area: ['700px', '450px'],
+                	  fixed: false, //不固定
+                	  maxmin: true,
+                	  content:"/ln/modify?id="+data.id
+                	});
+            } else if (obj.event === 'delete') {
+                layer.confirm('确认删除', function (index) {
+                 //   obj.del();
+                  //  layer.close(index);
+               // });
+			   // layer.alert(JSON.stringify(data)); 
+				$.ajax({   
+					url:'/ln/deleteById',       
+					method:'post',       
+					data:{
+						id:data.id
+					},        
+					dataType:'json',         
+					success:function(res){   
+						console.log(res,11111111) 
+						if(res.flag){
+							layer.alert('删除成功', {
+		        			icon: 6,
+		        			title: "提示"
+		        			});
+							$(".layui-laypage-btn").click();
+						}else{
+							layer.alert('删除失败', {
+		        			icon: 5,
+		        			title: "提示"
+		        			});
+						}
+					},              
+					error:function (data) {
+					}           
+				}) ;
+			  })
+            }
+        });
+
+    });
+</script>
+<script>
+
+</script>
+
+</body>
+</html>

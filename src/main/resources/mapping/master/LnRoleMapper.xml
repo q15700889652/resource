@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.master.LnRoleMapper">
+    <!--页面展示功能查询  -->
+	<select id="getRole"
+		resultType="com.example.demo.model.LnRole"
+		parameterType="com.example.demo.model.LnRole">
+		SELECT roleid,rolename,status,remarsk,createtime,createname,createcode FROM ln_role where 1=1	
+	</select>
+		
+	<!-- 角色信息增加 -->
+    <insert id="getRoleAdd" parameterType="com.example.demo.model.LnRole">  
+        insert into ln_role
+		(roleid,rolename,status,remarsk,createtime,createname,createcode)
+		values
+		(null,#{rolename},#{status},#{remarsk},#{createtime},#{createName},#{createcode})
+    </insert>
+		
+</mapper>

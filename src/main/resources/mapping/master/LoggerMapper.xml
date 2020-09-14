@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.master.LoggerMapper">
+	<!-- 增加日志数据 -->
+	<insert id="add" parameterType="com.example.demo.model.Logger">
+		insert into ln_logger
+		(id,userCode,operateUser,menuName,operateUrl,operateIp,operateDate,operateBrowser,operatingSystem)
+		values
+		(null,#{userCode},'',#{menuName},#{operateUrl},#{operateIp},#{operateDate},#{operateBrowser},#{operatingSystem})
+	</insert>
+	<!--分页查询 -->
+	<select id="getLogger"
+		resultType="com.example.demo.model.Logger"
+		parameterType="com.example.demo.model.Logger">
+		SELECT
+		id,userCode,operateUser,menuName,operateUrl,operateIp,operateDate,operateBrowser,operatingSystem
+		FROM ln_logger  where 1=1
+		<if test="null != userCode and '' != userCode">
+			and userCode = #{userCode}
+		</if>
+        <if test="null != operateIp and '' != operateIp">
+			and operateIp = #{operateIp}
+		</if>
+		limit #{page},#{limit}
+	</select>
+	<!--查询单条数据  -->
+	<select id="getOneLogger"
+		resultType="com.example.demo.model.Logger"
+		parameterType="String">
+		SELECT
+		id,userCode,operateUser,menuName,operateUrl,operateIp,operateDate,operateBrowser,operatingSystem
+		FROM ln_logger  where id=#{id}
+	</select>
+	<!-- 查询总条数 -->
+	<select id="getCount" resultType="int"
+		parameterType="com.example.demo.model.Logger">
+		select count(1) as count from ln_logger  where 1=1
+		<if test="null != userCode and '' != userCode">
+			and userCode = #{userCode}
+		</if>
+        <if test="null != operateIp and '' != operateIp">
+			and operateIp = #{operateIp}
+		</if>
+	</select>
+	
+	
+	<!-- 修改 -->
+	<update id="loggerUpdate" parameterType="com.example.demo.model.Logger" >    
+    UPDATE ln_logger 
+    SET id=#{id},userCode=#{userCode},operateUser=#{operateUser},menuName=#{menuName},operateUrl=#{operateUrl},operateIp=#{operateIp},
+    operateDate=#{operateDate},operateBrowser=#{operateBrowser},operatingSystem=#{operatingSystem}   
+    WHERE id=#{id};
+	</update>
+	
+	<!-- 日志信息增加 -->
+    <insert id="getLoggerAdd" parameterType="com.example.demo.model.Logger">  
+        insert into ln_logger
+		(id,userCode,operateUser,menuName,operateUrl,operateIp,operateDate,operateBrowser,operatingSystem)
+		values
+		(null,#{userCode},#{operateUser},#{menuName},#{operateUrl},#{operateIp},#{operateDate},#{operateBrowser},#{operatingSystem})
+    </insert>
+	<!--根据id进行删除  -->
+	<delete id="deleteById" parameterType="com.example.demo.model.Logger">
+	DELETE FROM ln_logger WHERE id=#{id}
+	</delete>
+
+	<!-- 查询菜单角色 -->
+<!-- 	<select id="getMeunRole" resultType="int"
+		parameterType="com.example.demo.model.LnMenu">
+		SELECT a.title as title,c.rolename as rolename FROM ln_menu a LEFT JOIN
+		ln_role_menu b ON a.menuid=b.menuid
+		LEFT JOIN ln_role c ON c.roleid=b.roleid
+	</select>
+ -->
+ <!--下拉框数据查询 -->
+	<select id="getSelectData"
+		resultType="com.example.demo.model.SelectData"
+		parameterType="String">
+		SELECT DISTINCT
+		${columnCode} as userCode,${columnName} as userName
+		FROM ${table} where 1=1 and ${columnName} is not null
+	</select>
+	
+</mapper> 

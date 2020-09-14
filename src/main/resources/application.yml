@@ -1,0 +1,20 @@
+spring: 
+   profiles:
+      active: dev2
+   # 
+   mvc: 
+      static-path-pattern: /static/**
+   #配置Thymeleaf的文件路径，可自定义
+   thymeleaf: 
+      prefix: 
+         classpath: /templates/
+      suffix: .html
+   servlet:
+        multipart:
+            max-file-size: 10MB  # 单个文件的大小
+            max-request-size: 100MB  # 上传文件的总大小
+   devtools:
+    restart:
+      enabled: true  #设置开启热部署
+      additional-paths: src/main/java #重启目录
+      exclude: WEB-INF/**

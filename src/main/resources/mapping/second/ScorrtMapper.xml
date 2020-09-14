@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.second.ScorrtMapper">
+	<!-- 查询单条记录 -->
+	<select id="query" resultType="com.example.demo.model.Scorrt">
+		SELECT * FROM LN_SCORRT
+	</select>
+	<!-- 新增 -->
+	<insert id="insert">
+		insert into LN_SCORRT values(2,"king","打游戏")
+	</insert>
+	 <select id="getScorrtByUsercode" resultType="com.example.demo.model.Scorrt">
+ SELECT authorityId,authorityName,orderNumber,menuUrl,menuIcon,createTime,authority,checked,updateTime,isMenu,parentId
+ FROM ln_scorrt 
+ </select>
+</mapper> 
